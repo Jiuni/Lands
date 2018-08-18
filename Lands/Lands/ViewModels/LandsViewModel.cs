@@ -36,6 +36,18 @@
         #region Methods
         private async void LoadLands()
         {
+
+            var connection = await this.apiService.CheckConnection();
+
+            if (!connection.IsSuccess)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                   "Error",
+                   connection.Message,
+                   "Accept");
+                await Application.Current.MainPage.Navigation.PopAsync();
+            }
+
             var response = await this.apiService.GetList<Land>(
                 "http://restcountries.eu",
                 "/rest",
@@ -47,19 +59,13 @@
                     "Error", 
                     response.Message,
                     "Accept");
-                
+                await Application.Current.MainPage.Navigation.PopAsync();
                 return;
             }
 
             var list = (List<Land>)response.Result;
             this.Lands = new ObservableCollection<Land>(list);
-            return new Response(
-            {
-                IsSuccess = true,
-                Message = "Ok",
-                Result = list,
-            });
-
+            
         }
         #endregion
     }
